@@ -134,20 +134,20 @@ class Mundo:
 	def plot(self):
 
 
-		self.solids[0].points = self.solids[0].points + [0,-5,-2]
-		self.solids[2].points = self.solids[2].points + [3,-5,-2]
+		self.solids[0].points = self.solids[0].points + [2,-3, 0]
+		self.solids[2].points = self.solids[2].points + [5,-3, 0]
 
-		self.solids[1].points = self.solids[1].points + [-5,3,1]
-		self.solids[3].points = self.solids[3].points + [-1, 3, 1]
+		self.solids[1].points = self.solids[1].points + [-6,3,1]
+		self.solids[3].points = self.solids[3].points + [-2,3,1]
 		axis_values = np.arange(self.i, self.f + 1, 0.1)
 		zeros = np.zeros(axis_values.shape)
 		fig = plt.figure()
 		ax = fig.add_subplot(111, projection='3d')
-		ax.set_xlim3d(self.i, self.f)
+		ax.set_xlim3d(self.i-1, self.f+1)
 		ax.set_xlabel('X-label')
-		ax.set_ylim3d(self.f, self.i)
+		ax.set_ylim3d(self.f+1, self.i-1)
 		ax.set_ylabel('Z-label')
-		ax.set_zlim3d(self.i, self.f)
+		ax.set_zlim3d(self.i-1, self.f+1)
 		ax.set_zlabel('Y-label')
 
 		ax.plot3D(axis_values, zeros, zeros, c='black')
