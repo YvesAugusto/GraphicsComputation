@@ -28,6 +28,14 @@ class Quadrilatero(Solid):
 
 		return faces
 
+	@property
+	def i(self):
+		return self.points.min()
+
+	@property
+	def f(self):
+		return self.points.max()
+
 	def plot(self):
 		i = self.points.min()
 		f = self.points.max()
@@ -43,9 +51,9 @@ class Quadrilatero(Solid):
 		ax.set_zlim3d(i, f)
 		ax.set_zlabel('Y-label')
 		ax.add_collection3d(Poly3DCollection(self.faces, facecolors='black', linewidths=1, edgecolors='r', alpha=.25))
-		ax.plot3D(axis_values, zeros, zeros)
-		ax.plot3D(zeros, axis_values, zeros)
-		ax.plot3D(zeros, zeros, axis_values)
+		ax.plot3D(axis_values, zeros, zeros, c='black')
+		ax.plot3D(zeros, axis_values, zeros, c='black')
+		ax.plot3D(zeros, zeros, axis_values, c='black')
 		plt.show()
 
 
@@ -67,6 +75,14 @@ class Piramide(Solid):
 
 		return faces
 
+	@property
+	def i(self):
+		return self.points.min()
+
+	@property
+	def f(self):
+		return self.points.max()
+
 	def plot(self):
 		i = self.points.min()
 		f = self.points.max()
@@ -83,29 +99,65 @@ class Piramide(Solid):
 		ax.set_zlim3d(i, f)
 		ax.set_zlabel('Y-label')
 		ax.add_collection3d(Poly3DCollection(self.faces, facecolors='black', linewidths=1, edgecolors='r', alpha=.25))
-		ax.plot3D(axis_values, zeros, zeros)
-		ax.plot3D(zeros, axis_values, zeros)
-		ax.plot3D(zeros, zeros, axis_values)
+		ax.plot3D(axis_values, zeros, zeros, c='black')
+		ax.plot3D(zeros, axis_values, zeros, c='black')
+		ax.plot3D(zeros, zeros, axis_values, c='black')
 		plt.show()
 
-def plot_all(solids, params):
-	i = params.min()
-	f = params.max()
+class Mundo:
 
-	fig = plt.figure()
-	ax = fig.add_subplot(111, projection='3d')
-	ax.set_xlim3d(i, f)
-	ax.set_xlabel('X-label')
-	ax.set_ylim3d(f, i)
-	ax.set_ylabel('Z-label')
-	ax.set_zlim3d(i, f)
-	ax.set_zlabel('Y-label')
-	for solid in solids:
-		ax.add_collection3d(Poly3DCollection(
-			solid, facecolors='black',
-			linewidths=1, edgecolors='r',
-			alpha=.25))
-	plt.show()
+	def __init__(self):
+		self.solids = []
+		self.origo = [0,0,0]
+
+	def add_solid(self, solid):
+		self.solids.append(solid)
+
+	@property
+	def f(self):
+		p = []
+		for i in range(len(self.solids)):
+			p += [self.solids[i].i]
+			p += [self.solids[i].f]
+		p = np.array(p)
+		return p.max()
+
+	@property
+	def i(self):
+		p = []
+		for i in range(len(self.solids)):
+			p += [self.solids[i].i]
+			p += [self.solids[i].f]
+		p = np.array(p)
+		return p.min()
+
+	def plot(self):
+
+
+		self.solids[0].points = self.solids[0].points + [0,-5,-2]
+		self.solids[2].points = self.solids[2].points + [3,-5,-2]
+
+		self.solids[1].points = self.solids[1].points + [-5,3,1]
+		self.solids[3].points = self.solids[3].points + [-1, 3, 1]
+		axis_values = np.arange(self.i, self.f + 1, 0.1)
+		zeros = np.zeros(axis_values.shape)
+		fig = plt.figure()
+		ax = fig.add_subplot(111, projection='3d')
+		ax.set_xlim3d(self.i, self.f)
+		ax.set_xlabel('X-label')
+		ax.set_ylim3d(self.f, self.i)
+		ax.set_ylabel('Z-label')
+		ax.set_zlim3d(self.i, self.f)
+		ax.set_zlabel('Y-label')
+
+		ax.plot3D(axis_values, zeros, zeros, c='black')
+		ax.plot3D(zeros, axis_values, zeros, c='black')
+		ax.plot3D(zeros, zeros, axis_values, c='black')
+		for i in range(len(self.solids)):
+			ax.add_collection3d(
+				Poly3DCollection(self.solids[i].faces, facecolors='black',
+								 linewidths=1, edgecolors='r', alpha=.25))
+		plt.show()
 
 if __name__ == '__main__':
 	center = [0,0,0]
@@ -125,7 +177,6 @@ if __name__ == '__main__':
 	cube[:,[1, 2]] = cube[:,[2, 1]]
 	cube = Quadrilatero(cube)
 	cube.plot()
-		# (cube, -0.75, 1.5)
 
 	x = 1.5
 	y = 5.0
@@ -144,7 +195,6 @@ if __name__ == '__main__':
 
 	paral[:, [1, 2]] = paral[:, [2, 1]]
 	paral = Quadrilatero(paral)
-	# plot_cube(paral, 0, 5)
 	paral.plot()
 
 	pyr = np.array([
@@ -156,7 +206,6 @@ if __name__ == '__main__':
 	])
 	pyr[:, [1,2]] = pyr[:, [2,1]]
 	pyr = Piramide(pyr)
-	# plot_cube(pyr_faces, -1, 3)
 	pyr.plot()
 
 	k1 = 3.0
@@ -178,7 +227,9 @@ if __name__ == '__main__':
 	trunk = Quadrilatero(trunk)
 	trunk.plot()
 
-	# plot_all([paral, pyr_faces, cube, trunk_faces],
-	# 		 np.array([0, 5, -1,3,-0.75, 1.5, -k1/2, h]))
-	# plt.show()
-
+	mundo = Mundo()
+	mundo.add_solid(cube)
+	mundo.add_solid(paral)
+	mundo.add_solid(pyr)
+	mundo.add_solid(trunk)
+	mundo.plot()
