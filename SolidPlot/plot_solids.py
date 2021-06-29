@@ -29,6 +29,35 @@ class Quadrilatero(Solid):
 		return faces
 
 	@property
+	def centroid(self):
+		# sum_x = np.sum(self.points[:, 0])
+		# sum_y = np.sum(self.points[:, 1])
+		# sum_z = np.sum(self.points[:, 2])
+		# center = np.array([sum_x, sum_y, sum_z]) / self.points.shape[0]
+		# return center
+		# ------------- Calcula arestas superior e inferior --------------
+		l1 = np.abs(np.sum(self.points[0] - self.points[1]))
+		l2 = np.abs(np.sum(self.points[2] - self.points[3]))
+		# ------------- Calcula áreas superior e inferior --------------
+		A1 = l1 ** 2
+		A2 = l2 ** 2
+
+		# ------------- Calcula os centros das bases superior e inferior --------------
+		inferior_base_points = self.faces[0].copy()
+		inferior_base_center = np.mean(inferior_base_points, axis = 0)
+		superior_base_points = self.faces[1].copy()
+		superior_base_center = np.mean(superior_base_points, axis=0)
+
+		# ------------- Calcula o vetor de altura --------------
+		h = np.abs(superior_base_center[2] - inferior_base_center[2])
+
+		# Calcula a que altura do centro da base ficará o centroide
+		factor = 0.25 * (A1 + 2 * np.sqrt(A1 * A2) + 3 * A2) / (A1 + np.sqrt(A1 * A1) + A2)
+		# Adiciona o valor de altura ao eixo y do centro da base inferior
+		center = inferior_base_center + np.array([0, 0, h * factor])
+		return center
+
+	@property
 	def i(self):
 		return self.points.min()
 
@@ -36,7 +65,7 @@ class Quadrilatero(Solid):
 	def f(self):
 		return self.points.max()
 
-	def plot(self):
+	def plot(self, center = True):
 		i = self.points.min()
 		f = self.points.max()
 		k = f
@@ -54,6 +83,8 @@ class Quadrilatero(Solid):
 		ax.plot3D(axis_values, zeros, zeros, c='black')
 		ax.plot3D(zeros, axis_values, zeros, c='black')
 		ax.plot3D(zeros, zeros, axis_values, c='black')
+		if center:
+			print(self.centroid)
 		plt.show()
 
 
@@ -76,6 +107,19 @@ class Piramide(Solid):
 		return faces
 
 	@property
+	def centroid(self):
+		base_points = self.points[0:4]
+		apex = self.points[4]
+
+		sum_x = np.sum(base_points)
+		sum_y = np.sum(base_points)
+		sum_z = np.sum(base_points)
+		base_center = np.array([sum_x, sum_y, sum_z]) / base_points.shape[0]
+
+		center = (apex - base_center) / 4
+		return center
+
+	@property
 	def i(self):
 		return self.points.min()
 
@@ -83,7 +127,7 @@ class Piramide(Solid):
 	def f(self):
 		return self.points.max()
 
-	def plot(self):
+	def plot(self, center = True):
 		i = self.points.min()
 		f = self.points.max()
 
@@ -102,6 +146,8 @@ class Piramide(Solid):
 		ax.plot3D(axis_values, zeros, zeros, c='black')
 		ax.plot3D(zeros, axis_values, zeros, c='black')
 		ax.plot3D(zeros, zeros, axis_values, c='black')
+		if center:
+			print(self.centroid)
 		plt.show()
 
 class Mundo:
