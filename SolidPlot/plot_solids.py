@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection, LineCollection
+import random
 
 class Solid:
 	def __init__(self):
@@ -154,7 +155,7 @@ class Mundo:
 
 	def __init__(self):
 		self.solids = []
-		self.origo = [0,0,0]
+		self.base_vectors = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 	def add_solid(self, solid):
 		self.solids.append(solid)
@@ -177,28 +178,116 @@ class Mundo:
 		p = np.array(p)
 		return p.min()
 
-	def plot(self):
+	@property
+	def center(self):
+		at = np.array([0, 0, 0], dtype=np.float32)
+		for s in self.solids:
+			at += s.centroid
+
+		return at / len(self.solids)
+
+	def change_base(self, eye):
+		at = self.center
+		n = (at - eye) / (at - eye) ** 2
+		# create random vector aux
+		x = random.uniform(0.6, 0.8)
+		y = random.uniform(0,0.01)
+		z = random.uniform(1.6, 1.8)
+		aux = [-x, y, z]
+		print(aux)
+
+		# get perpendicular vector "v"
+		v = np.cross(n,aux)
+		v = v / v ** 2
+		# get the final vector "s"
+		s = np.cross(v,n)
+		s = s / s ** 2
+
+		T = self.base_vectors.copy()
+		self.base_vectors = np.array([
+			s, v, n
+		])
+		R = self.base_vectors.copy()
+
+		for idx, solid in enumerate(self.solids):
+			for i in range(self.solids[idx].points.shape[0]):
+				self.solids[idx].points[i] = R.T.dot(T).dot(self.solids[idx].points[i])
+
+	def project(self):
+
+		axis_values = np.arange(int(self.i), int(self.f) + 1, 0.1)
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		# ax = fig.add_subplot(111, projection='3d')
+		# ax.set_xlim3d(int(self.i - 1), int(self.f + 1))
+		# ax.set_xlabel('X-label')
+		# ax.set_ylim3d(int(self.f + 1), int(self.i - 1))
+		# ax.set_ylabel('Z-label')
+		# ax.set_zlim3d(int(self.i - 1), int(self.f + 1))
+		# ax.set_zlabel('Y-label')
+
+		# ax.plot3D(self.base_vectors[0][0] * axis_values,
+		# 		  self.base_vectors[0][1] * axis_values,
+		# 		  self.base_vectors[0][2] * axis_values, c='black')
+		# ax.plot3D(self.base_vectors[1][0] * axis_values,
+		# 		  self.base_vectors[1][1] * axis_values,
+		# 		  self.base_vectors[1][2] * axis_values, c='black')
+		# ax.plot3D(self.base_vectors[2][0] * axis_values,
+		# 		  self.base_vectors[2][1] * axis_values,
+		# 		  self.base_vectors[2][2] * axis_values, c='black')
 
 
-		self.solids[0].points = self.solids[0].points + [2,-3, 0]
-		self.solids[2].points = self.solids[2].points + [5,-3, 0]
+		colors = ['b', 'g', 'r', 'c']
+		faces = []
+		for i in range(len(self.solids)):
+			face = self.solids[i].points.copy()
+			face = np.array([face[:,0], face[:,2]]).T
+			faces.append(face)
+			# ax.plot(face[:,0], face[:,1], color = colors[i])
+			# print(f'Face {i + 1}: {face}')
 
-		self.solids[1].points = self.solids[1].points + [-6,3,1]
-		self.solids[3].points = self.solids[3].points + [-2,3,1]
-		axis_values = np.arange(self.i, self.f + 1, 0.1)
+
+		faces = np.array(faces)
+		ax.set_xlim(self.i-1, self.f+1)
+		ax.set_ylim(self.i-1, self.f+1)
+		ax.add_collection(
+			LineCollection(faces, linewidths=(2, 2, 2, 2), colors=colors, linestyle='solid'))
+		plt.show()
+
+	def plot(self, changed_base = False):
+
+		if not changed_base:
+			self.solids[0].points = self.solids[0].points + [2,-3, 0]
+			self.solids[2].points = self.solids[2].points + [5,-2, 0]
+
+			self.solids[1].points = self.solids[1].points + [-6,3,1]
+			self.solids[3].points = self.solids[3].points + [-2,3,1]
+
+		axis_values = np.arange(int(self.i), int(self.f) + 1, 0.1)
+		# x =  +  + self.base_vectors[0][1] * axis_values
+		# y = self.base_vectors[1][0] * axis_values + self.base_vectors[1][1] * axis_values + self.base_vectors[1][1] * axis_values
+		# z = self.base_vectors[2][0] * axis_values + self.base_vectors[2][1] * axis_values + self.base_vectors[2][1] * axis_values
 		zeros = np.zeros(axis_values.shape)
 		fig = plt.figure()
 		ax = fig.add_subplot(111, projection='3d')
-		ax.set_xlim3d(self.i-1, self.f+1)
+		ax.set_xlim3d(int(self.i-1), int(self.f+1))
 		ax.set_xlabel('X-label')
-		ax.set_ylim3d(self.f+1, self.i-1)
+		ax.set_ylim3d(int(self.f+1), int(self.i-1))
 		ax.set_ylabel('Z-label')
-		ax.set_zlim3d(self.i-1, self.f+1)
+		ax.set_zlim3d(int(self.i-1), int(self.f+1))
 		ax.set_zlabel('Y-label')
 
-		ax.plot3D(axis_values, zeros, zeros, c='black')
-		ax.plot3D(zeros, axis_values, zeros, c='black')
-		ax.plot3D(zeros, zeros, axis_values, c='black')
+		ax.plot3D(self.base_vectors[0][0] * axis_values,
+				  self.base_vectors[0][1] * axis_values,
+				  self.base_vectors[0][2] * axis_values, c='black')
+		ax.plot3D(self.base_vectors[1][0] * axis_values,
+				  self.base_vectors[1][1] * axis_values,
+				  self.base_vectors[1][2] * axis_values, c='black')
+		ax.plot3D(self.base_vectors[2][0] * axis_values,
+				  self.base_vectors[2][1] * axis_values,
+				  self.base_vectors[2][2] * axis_values, c='black')
+		# ax.plot3D(zeros, axis_values, zeros, c='black')
+		# ax.plot3D(zeros, zeros, axis_values, c='black')
 		for i in range(len(self.solids)):
 			ax.add_collection3d(
 				Poly3DCollection(self.solids[i].faces, facecolors='black',
@@ -273,9 +362,15 @@ if __name__ == '__main__':
 	trunk = Quadrilatero(trunk)
 	trunk.plot()
 
+	e = [-1, -3, -1]
 	mundo = Mundo()
 	mundo.add_solid(cube)
 	mundo.add_solid(paral)
 	mundo.add_solid(pyr)
 	mundo.add_solid(trunk)
 	mundo.plot()
+
+	mundo.change_base(e)
+	mundo.plot(changed_base = True)
+
+	mundo.project()
