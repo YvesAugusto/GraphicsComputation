@@ -17,6 +17,25 @@ class Quadrilatero(Solid):
 		self.points = points
 
 	@property
+	def arestas(self):
+		arestas = np.array([
+			[self.points[0], self.points[1]],
+			[self.points[0], self.points[2]],
+			[self.points[2], self.points[3]],
+			[self.points[1], self.points[3]],
+			[self.points[1], self.points[5]],
+			[self.points[5], self.points[7]],
+			[self.points[7], self.points[3]],
+			[self.points[5], self.points[4]],
+			[self.points[4], self.points[6]],
+			[self.points[6], self.points[7]],
+			[self.points[0], self.points[4]],
+			[self.points[2], self.points[6]],
+		])
+
+		return arestas
+
+	@property
 	def faces(self):
 		faces = np.array([
 			[self.points[0], self.points[1], self.points[5], self.points[4]],
@@ -94,6 +113,21 @@ class Piramide(Solid):
 	def __init__(self, points):
 		super(Piramide, self).__init__()
 		self.points = points
+
+	@property
+	def arestas(self):
+		arests = np.array([
+			[self.points[0], self.points[1]],
+			[self.points[1], self.points[2]],
+			[self.points[2], self.points[3]],
+			[self.points[3], self.points[1]],
+			[self.points[0], self.points[4]],
+			[self.points[1], self.points[4]],
+			[self.points[2], self.points[4]],
+			[self.points[3], self.points[4]]
+		])
+
+		return arests
 
 	@property
 	def faces(self):
@@ -193,7 +227,7 @@ class Mundo:
 		x = random.uniform(0.6, 0.8)
 		y = random.uniform(0,0.01)
 		z = random.uniform(1.6, 1.8)
-		aux = [-x, y, z]
+		aux = [x, -y, -z]
 		print(aux)
 
 		# get perpendicular vector "v"
@@ -205,7 +239,7 @@ class Mundo:
 
 		T = self.base_vectors.copy()
 		self.base_vectors = np.array([
-			s, v, n
+			s, n, v
 		])
 		R = self.base_vectors.copy()
 
@@ -238,20 +272,19 @@ class Mundo:
 
 
 		colors = ['b', 'g', 'r', 'c']
-		faces = []
 		for i in range(len(self.solids)):
-			face = self.solids[i].points.copy()
-			face = np.array([face[:,0], face[:,2]]).T
-			faces.append(face)
-			# ax.plot(face[:,0], face[:,1], color = colors[i])
-			# print(f'Face {i + 1}: {face}')
+			# solid = self.solids[i].copy()
+			self.solids[i].points = np.array([self.solids[i].points[:,0], self.solids[i].points[:,2]]).T
+			# solids.append(solid)
 
-
-		faces = np.array(faces)
 		ax.set_xlim(self.i-1, self.f+1)
 		ax.set_ylim(self.i-1, self.f+1)
-		ax.add_collection(
-			LineCollection(faces, linewidths=(2, 2, 2, 2), colors=colors, linestyle='solid'))
+		for i, solid in enumerate(self.solids):
+			print(solid.arestas)
+			for aresta in solid.arestas:
+				ax.plot(aresta[:,0], aresta[:,1], color=colors[i])
+				# ax.add_collection(
+				# 	LineCollection(aresta, linewidths=(2, 2, 2, 2), colors=colors, linestyle='solid'))
 		plt.show()
 
 	def plot(self, changed_base = False):
@@ -362,7 +395,7 @@ if __name__ == '__main__':
 	trunk = Quadrilatero(trunk)
 	trunk.plot()
 
-	e = [-1, -3, -1]
+	e = [2, 4, -2]
 	mundo = Mundo()
 	mundo.add_solid(cube)
 	mundo.add_solid(paral)
