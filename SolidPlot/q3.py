@@ -219,9 +219,9 @@ class Mundo:
         n = np.divide(n,np.linalg.norm(n))
 
         # create random vector aux
-        x = random.uniform(0.6, 0.8)
-        y = random.uniform(0,0.01)
-        z = random.uniform(1.6, 1.8)
+        x = random.uniform(1, 5)
+        y = random.uniform(1, 5)
+        z = random.uniform(1, 5)
         aux = np.array([x, y, -z])
         # aux = aux / aux.dot(aux)
         # print(f'Random vector: {aux}')
@@ -415,9 +415,9 @@ if __name__ == '__main__':
     y = np.random.uniform(2,3)
     z = np.random.uniform(1,2)
 
-    x = 3
-    y = 4
-    z = 5
+    x = 8
+    y = 1
+    z = 4
 
     mundo = Mundo()
 
