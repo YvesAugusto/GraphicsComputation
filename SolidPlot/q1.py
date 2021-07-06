@@ -195,148 +195,12 @@ class Piramide(Solid):
 		# if center:
 		# 	print(self.centroid)
 		plt.show()
-
-class Mundo:
-
-	def __init__(self):
-		self.solids = []
-		self.base_vectors = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-
-	def add_solid(self, solid):
-		self.solids.append(solid)
-
-	@property
-	def f(self):
-		p = []
-		for i in range(len(self.solids)):
-			p += [self.solids[i].i]
-			p += [self.solids[i].f]
-		p = np.array(p)
-		return p.max()
-
-	@property
-	def i(self):
-		p = []
-		for i in range(len(self.solids)):
-			p += [self.solids[i].i]
-			p += [self.solids[i].f]
-		p = np.array(p)
-		return p.min()
-
-	@property
-	def center(self):
-		at = np.array([0, 0, 0], dtype=np.float32)
-		# for s in self.solids:
-		# 	at += s.centroid
-
-		at = self.solids[0].centroid + self.solids[2].centroid
-
-		# return at / len(self.solids)
-		return at / 2
-
-	def change_base(self, eye):
-		at = self.center
-		n = (at - eye) / (at - eye).dot(at-eye)
-		# create random vector aux
-		x = random.uniform(0.6, 0.8)
-		y = random.uniform(0,0.01)
-		z = random.uniform(1.6, 1.8)
-		aux = [x, y, -z]
-		print(f'Random vector: {aux}')
-
-		# get perpendicular vector "v"
-		v = np.cross(n,aux)
-		v = v / v.dot(v)
-		# get the final vector "s"
-		s = np.cross(v,n)
-		s = s / s.dot(s)
-
-		T = self.base_vectors.copy()
-		self.base_vectors = np.array([
-			s, n, v
-		])
-		R = self.base_vectors.copy()
-
-
-
-		for idx, solid in enumerate(self.solids):
-			for i in range(self.solids[idx].points.shape[0]):
-				self.solids[idx].points[i] = R.dot(self.solids[idx].points[i])
-
-
-
-	def project(self):
-
-		axis_values = np.arange(int(self.i), int(self.f) + 1, 0.1)
-		fig = plt.figure()
-		ax = fig.add_subplot(111)
-
-
-		colors = ['b', 'g', 'r', 'c']
-		for i in range(len(self.solids)):
-			# solid = self.solids[i].copy()
-			self.solids[i].points = np.array([self.solids[i].points[:,0], self.solids[i].points[:,2]]).T
-			# solids.append(solid)
-
-		ax.set_xlim(self.i-1, self.f+1)
-		ax.set_ylim(self.i-1, self.f+1)
-		for i, solid in enumerate(self.solids):
-			for aresta in solid.arestas:
-				ax.plot(aresta[:,0], aresta[:,1], color=colors[i])
-		plt.show()
-
-	def plot(self, changed_base = False):
-
-		if not changed_base:
-			self.solids[0].points = self.solids[0].points + [2,-3, 0]
-			self.solids[2].points = self.solids[2].points + [5,-2, 0]
-
-			self.solids[1].points = self.solids[1].points + [-6,3,1]
-			self.solids[3].points = self.solids[3].points + [-2,3,1]
-
-		print()
-		print('----------------------------------------')
-		for i in range(len(self.solids)):
-			print(self.solids[i])
-		print('----------------------------------------')
-		print()
-		axis_values = np.arange(int(self.i), int(self.f) + 1, 0.1)
-		# x =  +  + self.base_vectors[0][1] * axis_values
-		# y = self.base_vectors[1][0] * axis_values + self.base_vectors[1][1] * axis_values + self.base_vectors[1][1] * axis_values
-		# z = self.base_vectors[2][0] * axis_values + self.base_vectors[2][1] * axis_values + self.base_vectors[2][1] * axis_values
-		zeros = np.zeros(axis_values.shape)
-		fig = plt.figure()
-		ax = fig.add_subplot(111, projection='3d')
-		ax.set_xlim3d(int(self.i-1), int(self.f+1))
-		ax.set_xlabel('X-label')
-		ax.set_ylim3d(int(self.f+1), int(self.i-1))
-		ax.set_ylabel('Z-label')
-		ax.set_zlim3d(int(self.i-1), int(self.f+1))
-		ax.set_zlabel('Y-label')
-
-		ax.plot3D(self.base_vectors[0][0] * axis_values,
-				  self.base_vectors[0][1] * axis_values,
-				  self.base_vectors[0][2] * axis_values, c='black')
-		ax.plot3D(self.base_vectors[1][0] * axis_values,
-				  self.base_vectors[1][1] * axis_values,
-				  self.base_vectors[1][2] * axis_values, c='black')
-		ax.plot3D(self.base_vectors[2][0] * axis_values,
-				  self.base_vectors[2][1] * axis_values,
-				  self.base_vectors[2][2] * axis_values, c='black')
-		# ax.plot3D(zeros, axis_values, zeros, c='black')
-		# ax.plot3D(zeros, zeros, axis_values, c='black')
-		for i in range(len(self.solids)):
-			ax.add_collection3d(
-				Poly3DCollection(self.solids[i].faces, facecolors='black',
-								 linewidths=1, edgecolors='r', alpha=.25))
-		plt.show()
-
 if __name__ == '__main__':
-	center = [0,0,0]
-	a = 1.5
-	dx = dy = dz = a/2
+    center = [0,0,0]
+    a = 1.5
+    dx = dy = dz = a/2
 
-	cube = np.array([
+    cube = np.array([
 		[-dx, 0, -dz],
 		[-dx, 0, dz],
 		[-dx, 2*dy, -dz],
@@ -346,15 +210,15 @@ if __name__ == '__main__':
 		[dx, 2*dy, -dz],
 		[dx, 2*dy, dz]
 	])
-	cube[:,[1, 2]] = cube[:,[2, 1]]
-	cube = Quadrilatero(cube)
-	cube.plot()
+    cube[:,[1, 2]] = cube[:,[2, 1]]
+    cube = Quadrilatero(cube)
+    cube.plot()
 
-	x = 1.5
-	y = 5.0
-	z = 2.5
+    x = 1.5
+    y = 5.0
+    z = 2.5
 
-	paral = np.array([
+    paral = np.array([
 		[0, 0, 0],
 		[0, 0, z],
 		[0, y, 0],
@@ -365,25 +229,25 @@ if __name__ == '__main__':
 		[x, y, z]
 	])
 
-	paral[:, [1, 2]] = paral[:, [2, 1]]
-	paral = Quadrilatero(paral)
-	paral.plot()
+    paral[:, [1, 2]] = paral[:, [2, 1]]
+    paral = Quadrilatero(paral)
+    paral.plot()
 
-	pyr = np.array([
+    pyr = np.array([
 		[-1,0,1],
 		[1,0,1],
 		[1, 0, -1],
 		[-1, 0, -1],
 		[0,3,0]
 	])
-	pyr[:, [1,2]] = pyr[:, [2,1]]
-	pyr = Piramide(pyr)
-	pyr.plot()
+    pyr[:, [1,2]] = pyr[:, [2,1]]
+    pyr = Piramide(pyr)
+    pyr.plot()
 
-	k1 = 3.0
-	k2 = 1.3
-	h = 2.5
-	trunk = np.array([
+    k1 = 3.0
+    k2 = 1.3
+    h = 2.5
+    trunk = np.array([
 		[-k1/2, 0, -k1/2],
 		[-k1/2, 0, k1/2],
 		[-k2/2, h, -k2/2],
@@ -395,19 +259,6 @@ if __name__ == '__main__':
 		[k2/2, h, k2/2],
 	])
 
-	trunk[:, [1,2]] = trunk[:, [2,1]]
-	trunk = Quadrilatero(trunk)
-	trunk.plot()
-
-	e = [1, -2, 1]
-	mundo = Mundo()
-	mundo.add_solid(cube)
-	mundo.add_solid(paral)
-	mundo.add_solid(pyr)
-	mundo.add_solid(trunk)
-	mundo.plot()
-
-	mundo.change_base(e)
-	mundo.plot(changed_base = True)
-
-	mundo.project()
+    trunk[:, [1,2]] = trunk[:, [2,1]]
+    trunk = Quadrilatero(trunk)
+    trunk.plot()
