@@ -221,7 +221,7 @@ class Mundo:
         # create random vector aux
         x = random.uniform(1, 5)
         y = random.uniform(1, 5)
-        z = random.uniform(1, 5)
+        z = 5
         aux = np.array([x, y, -z])
         aux = np.divide(aux,np.linalg.norm(aux))
 
@@ -276,7 +276,6 @@ class Mundo:
             ax.set_zlim3d(int(self.i-1), int(self.f+1))
             ax.set_zlabel('Y-label')
         elif changed_base:
-            print(i, f)
             axis_values = np.arange(int(self.i), int(self.f) + 1, 0.1)
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -331,13 +330,10 @@ class Mundo:
                                  linewidths=1, edgecolors='r', alpha=.25))
 
         plt.show()
-        # if not changed_base:
-            # self.solids[0].translation(n)
-            # self.solids[1].translation(n)
-            # self.solids[2].translation(n)
-            # self.solids[3].translation(-n)
-            # print(self.solids[0], self.solids[0].points)
-            # print()
+        if not changed_base:
+            self.solids[0].translation(n)
+            self.solids[2].translation(n)
+
 
     def project(self):
         fig = plt.figure()
@@ -431,7 +427,7 @@ if __name__ == '__main__':
 
     # [8, 1, 4]
     # [3, 2, 1]
-    x = 8
+    x = 5
     y = 1
     z = 4
 

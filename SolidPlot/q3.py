@@ -131,17 +131,6 @@ class Piramide(Solid):
 
     @property
     def centroid(self):
-        # base_points = self.points[0:4]
-        # apex = self.points[4]
-        #
-        # sum_x = np.sum(base_points)
-        # sum_y = np.sum(base_points)
-        # sum_z = np.sum(base_points)
-        # base_center = np.array([sum_x, sum_y, sum_z]) / base_points.shape[0]
-        #
-        # center = (apex - base_center) / 4
-        # return center
-
         return np.mean(self.points, axis = 0)
 
     @property
@@ -205,33 +194,30 @@ class Mundo:
 
     @property
     def center(self):
-        at = np.array([0, 0, 0], dtype=np.float32)
-        # for s in self.solids:
-        # 	at += s.centroid
-
         at = self.solids[0].centroid + self.solids[2].centroid
-        # return at / len(self.solids)
         return at / 2
 
     def change_base(self, eye):
         at = self.center
         n = (at - eye)
-        n = np.divide(n,np.linalg.norm(n))
 
         # create random vector aux
         x = random.uniform(1, 5)
         y = random.uniform(1, 5)
-        z = random.uniform(1, 5)
+        z = 5
         aux = np.array([x, y, -z])
         # aux = aux / aux.dot(aux)
         # print(f'Random vector: {aux}')
 
         # get perpendicular vector "v"
         v = np.cross(n,aux)
-        v = np.divide(v,np.linalg.norm(v))
         # get the final vector "s"
         s = np.cross(n,v)
-        s = np.divide(s,np.linalg.norm(s))
+
+        n = np.divide(n, np.linalg.norm(n))
+        v = np.divide(v, np.linalg.norm(v))
+        s = np.divide(s, np.linalg.norm(s))
+
 
         # T = self.base_vectors.copy()
         self.base_vectors = np.array([
@@ -244,13 +230,8 @@ class Mundo:
         ])
         R = self.base_vectors.copy()
         R = np.linalg.inv(R)
-        # print(R.shape, self.solids[0].points.shape)
         for idx, solid in enumerate(self.solids):
-            # for i in range(self.solids[idx].points.shape[0]):
-            #     self.solids[idx].points[i] = R.dot(self.solids[idx].points[i])
             self.solids[idx].points = R.dot(self.solids[idx].points.T).T
-            # print(self.solids[idx].points)
-
 
 
     def plot(self, changed_base = False, eye = [0,0,0]):
@@ -283,7 +264,6 @@ class Mundo:
             ax.set_zlim3d(int(self.i-1), int(self.f+1))
             ax.set_zlabel('Y-label')
         elif changed_base:
-            print(i, f)
             axis_values = np.arange(int(self.i), int(self.f) + 1, 0.1)
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -298,19 +278,6 @@ class Mundo:
             # self.solids[3].translation([-15, 0, 0])
 
 
-        # if not changed_base:
-        #     print(self.center, eye, n)
-        #     ax.plot3D(self.center[0] * axis_values,
-        #               self.center[1] * axis_values,
-        #               self.center[2] * axis_values, c='red')
-        #
-        #     ax.plot3D(eye[0] * axis_values,
-        #               eye[1] * axis_values,
-        #               eye[2] * axis_values, c='red')
-        #
-        #     ax.plot3D(n[0] * axis_values,
-        #               n[1] * axis_values,
-        #               n[2] * axis_values, c='blue')
         if not changed_base:
             ax.plot3D(self.base_vectors[0][0] * axis_values,
                       self.base_vectors[0][1] * axis_values,
@@ -321,6 +288,7 @@ class Mundo:
             ax.plot3D(self.base_vectors[2][0] * axis_values,
                       self.base_vectors[2][1] * axis_values,
                       self.base_vectors[2][2] * axis_values, c='black')
+
         # ax.plot3D(zeros, axis_values, zeros, c='black')
         # ax.plot3D(zeros, zeros, axis_values, c='black')
         if not changed_base:
@@ -338,10 +306,10 @@ class Mundo:
                                  linewidths=1, edgecolors='r', alpha=.25))
 
         plt.show()
-        # if not changed_base:
-            # self.solids[0].translation(n)
+        if not changed_base:
+            self.solids[0].translation(n)
             # self.solids[1].translation(n)
-            # self.solids[2].translation(n)
+            self.solids[2].translation(n)
             # self.solids[3].translation(-n)
             # print(self.solids[0], self.solids[0].points)
             # print()
@@ -415,7 +383,7 @@ if __name__ == '__main__':
     y = np.random.uniform(2,3)
     z = np.random.uniform(1,2)
 
-    x = 8
+    x = 5
     y = 1
     z = 4
 
